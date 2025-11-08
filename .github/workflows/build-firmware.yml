@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        board: [esp32-s3-devkitc-1] # 複数ボードに対応可能
+        board: [esp32s3usbotg] # 複数ボードに対応可能
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
