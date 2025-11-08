@@ -3,9 +3,9 @@
 #include <math.h>
 
 // ===== I2S設定 =====
-#define I2S_DOUT 26
-#define I2S_BCLK 27
-#define I2S_LRC  25
+#define I2S_DOUT 5
+#define I2S_BCLK 6
+#define I2S_LRC  4
 
 #define SAMPLE_RATE 44100
 #define LUT_SIZE 256
