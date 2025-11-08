@@ -136,6 +136,9 @@ void setup() {
   playMelody(defaultMelody);
 
   Serial.println("規定メロディ再生完了。シリアルで曲データを入力してください。");
+  Serial.println("--------音データ---------");
+  Serial.println("C4:4,C#4:4,D4:4,D#4:4,E4:4,F4:4,F#4:4,G4:4,G#4:4,A4:4,A#4:4,B4:4");
+  Serial.println("------------------------");
 }
 
 // ===== ループでシリアル入力をチェック =====
