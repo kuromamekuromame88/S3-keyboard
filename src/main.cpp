@@ -25,6 +25,7 @@ void setup() {
 
 void loop() {
   Gamepad.rightStick(map(analogRead(15), 0, 4095, -128, 127), map(analogRead(16), 0, 4095, -128, 127));
+  delay(5);
   /*
   if (command.startsWith("PRESS_BUTTON_")) {
     String buttonStr = command.substring(13); // Extract number after "PRESS_BUTTON_"
