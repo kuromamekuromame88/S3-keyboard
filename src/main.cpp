@@ -16,6 +16,9 @@ const char* AP_PASS = "12345678";
 // =====================
 Adafruit_USBD_HID usb_hid;
 
+// 6キー同時押し用バッファ
+uint8_t keycodes[6] = {0, 0, 0, 0, 0, 0};
+
 // =====================
 // Web Server
 // =====================
@@ -23,8 +26,7 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
 // =====================
-// JS code → HID Keycode
-// US配列前提
+// JS code → HID Keycode（US配列）
 // =====================
 uint8_t keycodeFromJS(const String& code) {
   if (code.startsWith("Key"))
@@ -68,7 +70,7 @@ void onWsEvent(AsyncWebSocket* server,
 
   if (type != WS_EVT_DATA) return;
 
-  StaticJsonDocument<256> doc;
+  JsonDocument doc;
   if (deserializeJson(doc, data, len)) return;
 
   String action = doc["type"];
@@ -84,10 +86,14 @@ void onWsEvent(AsyncWebSocket* server,
     if (doc["alt"])   modifier |= KEYBOARD_MODIFIER_LEFTALT;
     if (doc["meta"])  modifier |= KEYBOARD_MODIFIER_LEFTGUI;
 
-    usb_hid.keyboardReport(0, modifier, key);
+    // 単キーなので keycodes[0] に入れる
+    keycodes[0] = key;
+
+    usb_hid.keyboardReport(0, modifier, keycodes);
   }
 
   if (action == "up") {
+    memset(keycodes, 0, sizeof(keycodes));
     usb_hid.keyboardRelease(0);
   }
 }
@@ -96,28 +102,21 @@ void onWsEvent(AsyncWebSocket* server,
 // setup
 // =====================
 void setup() {
-  // USB HID 初期化
   usb_hid.begin();
 
-  // WiFi AP
   WiFi.softAP(AP_SSID, AP_PASS);
 
-  // WebSocket
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
 
-  // HTML配信
   server.on("/", HTTP_GET, [](AsyncWebServerRequest* req) {
     req->send(200, "text/html", R"rawliteral(
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<title>ESP32-S3 Keyboard</title>
-</head>
+<head><meta charset="utf-8"></head>
 <body>
 <h2>ESP32-S3 Wireless Keyboard</h2>
-<p>Focus this page and type</p>
+<p>Click here and type</p>
 
 <script>
 const ws = new WebSocket(`ws://${location.host}/ws`);
